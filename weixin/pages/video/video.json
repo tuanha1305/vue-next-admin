@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "nav-bar": "../../components/navBar/navBar",
-    "video-list": "../../components/videoList/videoList"
-  },
-  "enablePullDownRefresh": true,
-  "onReachBottomDistance": 30
-}

@@ -1,7 +1,0 @@
-{
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "swipers": "/pages/index/component/swipers",
-    "lists": "/pages/index/component/list"
-  }
-}
