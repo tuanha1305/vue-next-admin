@@ -23,7 +23,7 @@
 
 #### 线上预览
 
-- vue3.x 版本预览（vue-next-admin） <a href="https://lyt-top.gitee.io/vue-next-admin-preview/#/login" target="_blank">https://lyt-top.gitee.io/vue-next-admin-preview/#/login</a>
+- vue3.x 版本预览（vue-next-admin）<a href="https://lyt-top.gitee.io/vue-next-admin-preview/#/login" target="_blank">https://lyt-top.gitee.io/vue-next-admin-preview/#/login</a>
 - vue2.x 版本预览（vue-prev-admin）<a href="https://lyt-top.gitee.io/vue-prev-admin-preview/#/login" target="_blank">https://lyt-top.gitee.io/vue-prev-admin-preview/#/login</a>
 
 #### 代码仓库
@@ -44,6 +44,9 @@ git clone https://gitee.com/lyt-top/vue-next-admin.git
 
 # 进入项目
 cd vue-next-admin
+
+# 切换分支
+git checkout vue-prev-admin
 
 # 安装依赖
 cnpm install
@@ -81,23 +84,12 @@ cnpm run build
 - <a href="https://github.com/vuejs/vue-router-next" target="_blank">vue-router-nex</a>
 - <a href="https://github.com/vuejs/vuex" target="_blank">vuex</a>
 - <a href="https://github.com/apache/echarts" target="_blank">echarts</a>
-- <a href="https://github.com/PanJiaChen/vue-element-admin" target="_blank">vue-element-admin</a>
 - <a href="https://github.com/axios/axios" target="_blank">axios</a>
 - <a href="https://github.com/zenorocha/clipboard.js" target="_blank">clipboard</a>
 - <a href="https://github.com/inorganik/countUp.js" target="_blank">countUp</a>
-- <a href="https://github.com/developit/mitt" target="_blank">mitt</a>
 - <a href="https://github.com/rstacruz/nprogress" target="_blank">nprogress</a>
 - <a href="https://github.com/sindresorhus/screenfull.js" target="_blank">screenfull</a>
-- <a href="https://github.com/SortableJS/Sortable" target="_blank">sortablejs</a>
 - <a href="https://github.com/sass/sass" target="_blank">sass</a>
-- <a href="https://github.com/microsoft/TypeScript" target="_blank">typescript</a>
-- <a href="https://github.com/vitejs/vite" target="_blank">vite</a>
-- <a href="https://github.com/wangeditor-team/wangEditor" target="_blank">wangeditor</a>
-- <a href="https://github.com/fengyuanchen/cropperjs" target="_blank">cropperjs</a>
-- <a href="https://github.com/antvis/g6" target="_blank">@antv/g6</a>
-- <a href="https://github.com/davidshimjs/qrcodejs" target="_blank">qrcodejs</a>
-- <a href="https://github.com/crabbly/Print.js" target="_blank">print-js</a>
-- <a href="https://github.com/likaia/screen-shot" target="_blank">vue-web-screen-shot</a>
 
 #### 特别感谢
 

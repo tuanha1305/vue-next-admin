@@ -47,7 +47,6 @@ const staticRoutes = [
 // 加载静态路由
 const createRouter = () =>
 	new VueRouter({
-		scrollBehavior: () => ({ y: 0 }),
 		routes: staticRoutes,
 	});
 
@@ -59,7 +58,7 @@ PrevLoading.start();
 
 // 多级嵌套数组处理成一维数组
 export function formatFlatteningRoutes(arr) {
-	if (arr.length < 0) return false;
+	if (arr.length <= 0) return false;
 	for (let i = 0; i < arr.length; i++) {
 		if (arr[i].children) {
 			arr = arr.slice(0, i + 1).concat(arr[i].children, arr.slice(i + 1));
@@ -71,7 +70,7 @@ export function formatFlatteningRoutes(arr) {
 // 处理 tagsViewList 数据，默认路由全部缓存
 // isKeepAlive 处理 `name` 值，进行路由缓存
 export function formatTwoStageRoutes(arr) {
-	if (arr.length < 0) return false;
+	if (arr.length <= 0) return false;
 	const newArr = [];
 	const cacheList = [];
 	arr.forEach((v) => {
@@ -135,7 +134,7 @@ export function keepAliveSplice(to) {
 
 // 处理后端返回的 `component` 路径，拼装实现懒加载
 export function loadView(path) {
-	return () => import(`@/views/${path}`);
+	return () => Promise.resolve(require(`@/views/${path}`));
 }
 
 // 递归处理每一项 `component` 中的路径
@@ -149,9 +148,9 @@ export function dynamicRouter(view) {
 // next({ ...to, replace: true }) 动态路由 addRoute 完毕后才放行，防止刷新时 NProgress 进度条加载2次
 // 文档地址：https://router.vuejs.org/zh/api/#router-addroutes
 export function adminUser(router, to, next) {
+	resetRouter();
 	getMenuAdmin()
 		.then((res) => {
-			resetRouter();
 			// 读取用户信息，获取对应权限进行判断
 			store.dispatch('userInfos/setUserInfos');
 			store.dispatch('routesList/setRoutesList', setFilterMenuFun(res.data.children, store.state.userInfos.userInfos.authPageList));
@@ -167,9 +166,9 @@ export function adminUser(router, to, next) {
 
 // 添加动态路由，`{ path: '*', redirect: '/404' }` 防止页面刷新，静态路由丢失问题
 export function testUser(router, to, next) {
+	resetRouter();
 	getMenuTest()
 		.then((res) => {
-			resetRouter();
 			// 读取用户信息，获取对应权限进行判断
 			store.dispatch('userInfos/setUserInfos');
 			store.dispatch('routesList/setRoutesList', setFilterMenuFun(res.data.children, store.state.userInfos.userInfos.authPageList));
@@ -188,23 +187,29 @@ export function resetRouter() {
 	router.matcher = createRouter().matcher;
 }
 
+// 延迟关闭进度条
+export function delayNProgressDone(time = 300) {
+	setTimeout(() => {
+		NProgress.done();
+	}, time);
+}
+
 // 路由加载前
 router.beforeEach((to, from, next) => {
-	NProgress.configure({ showSpinner: false });
-	NProgress.start();
 	keepAliveSplice(to);
+	NProgress.configure({ showSpinner: false });
+	if (to.meta.title && to.path !== '/login') NProgress.start();
 	let token = getSession('token');
-	if (to.fullPath === '/login' && !token) {
+	if (to.path === '/login' && !token) {
+		NProgress.start();
 		next();
-		NProgress.done();
+		delayNProgressDone();
 	} else {
 		if (!token) {
+			NProgress.start();
 			next('/login');
 			clearSession();
-			NProgress.done();
-		} else if (token && to.fullPath === '/login') {
-			next('/home');
-			NProgress.done();
+			delayNProgressDone();
 		} else {
 			// 动态加载后端返回路由路由(模拟数据)
 			if (!getSession('userInfo')) return false;
@@ -213,6 +218,7 @@ router.beforeEach((to, from, next) => {
 				else if (getSession('userInfo').userName === 'test') testUser(router, to, next);
 			} else {
 				next();
+				delayNProgressDone(0);
 			}
 		}
 	}
@@ -220,8 +226,8 @@ router.beforeEach((to, from, next) => {
 
 // 路由加载后
 router.afterEach(() => {
-	NProgress.done();
 	PrevLoading.done();
+	delayNProgressDone();
 });
 
 // 导出路由
