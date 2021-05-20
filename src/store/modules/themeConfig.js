@@ -41,6 +41,8 @@ const themeConfigModule = {
 			layout: 'defaults',
 			// 默认分栏高亮风格，可选值"<columns-round|columns-card>"，默认 columns-round
 			columnsAsideStyle: 'columns-round',
+			// 默认分栏布局风格，，可选值"<columns-horizontal|columns-vertical>"，默认 columns-vertical
+			columnsAsideLayout: 'columns-vertical',
 
 			/* 全局网站标题 / 副标题
             ------------------------------- */
@@ -52,8 +54,8 @@ const themeConfigModule = {
 			globalViceDes: 'vue2.x后台管理系统免费开源模板',
 			// 默认初始语言，可选值"<zh-cn|en|zh-tw>"，默认 zh-cn
 			globalI18n: 'zh-cn',
-			// 默认全局组件大小，可选值"<default|medium|small|mini>"，默认 default
-			globalComponentSize: 'default',
+			// 默认全局组件大小，可选值"<|medium|small|mini>"，默认 ''
+			globalComponentSize: '',
 		},
 	},
 	mutations: {
