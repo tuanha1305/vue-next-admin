@@ -12,7 +12,7 @@
 				>
 					<div :class="setColumnsAsidelayout" v-if="!v.meta.isLink || (v.meta.isLink && v.meta.isIframe)">
 						<i :class="v.meta.icon"></i>
-						<div class="layout-columns-aside-li-box-title font12">
+						<div class="font12">
 							{{
 								$t(v.meta.title) && $t(v.meta.title).length >= 4
 									? $t(v.meta.title).substr(0, setColumnsAsidelayout === 'columns-vertical' ? 4 : 3)
@@ -23,7 +23,7 @@
 					<div :class="setColumnsAsidelayout" v-else>
 						<a :href="v.meta.isLink" target="_blank">
 							<i :class="v.meta.icon"></i>
-							<div class="layout-columns-aside-li-box-title font12">
+							<div class="font12">
 								{{
 									$t(v.meta.title) && $t(v.meta.title).length >= 4
 										? $t(v.meta.title).substr(0, setColumnsAsidelayout === 'columns-vertical' ? 4 : 3)
@@ -88,6 +88,7 @@ export default {
 			if (this.$store.state.routesList.routesList.length <= 0) return false;
 			this.columnsAsideList = this.filterRoutesFun(this.$store.state.routesList.routesList);
 			const resData = this.setSendChildren(this.$route.path);
+			if (Object.keys(resData).length <= 0) return false;
 			this.onColumnsAsideDown(resData.item[0].k);
 			this.bus.$emit('setSendColumnsChildren', resData);
 		},
@@ -121,6 +122,7 @@ export default {
 			this.routeSplit.shift();
 			const routeFirst = `/${this.routeSplit[0]}`;
 			const currentSplitRoute = this.columnsAsideList.find((v) => v.path === routeFirst);
+			if (!currentSplitRoute) return false;
 			// 延迟拿值，防止取不到
 			setTimeout(() => {
 				this.onColumnsAsideDown(currentSplitRoute.k);

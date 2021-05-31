@@ -38,12 +38,15 @@
 						<el-switch v-model="getThemeConfig.isShowLogo" @change="setLocalThemeConfig"></el-switch>
 					</div>
 				</div>
-				<div class="layout-breadcrumb-seting-bar-flex mt15" :style="{ opacity: getThemeConfig.layout === 'transverse' ? 0.5 : 1 }">
+				<div
+					class="layout-breadcrumb-seting-bar-flex mt15"
+					:style="{ opacity: getThemeConfig.layout === 'classic' || getThemeConfig.layout === 'transverse' ? 0.5 : 1 }"
+				>
 					<div class="layout-breadcrumb-seting-bar-flex-label">{{ $t('message.layout.fourIsBreadcrumb') }}</div>
 					<div class="layout-breadcrumb-seting-bar-flex-value">
 						<el-switch
 							v-model="getThemeConfig.isBreadcrumb"
-							:disabled="getThemeConfig.layout === 'transverse'"
+							:disabled="getThemeConfig.layout === 'classic' || getThemeConfig.layout === 'transverse'"
 							@change="setLocalThemeConfig"
 						></el-switch>
 					</div>
@@ -88,6 +91,45 @@
 					<div class="layout-breadcrumb-seting-bar-flex-label">{{ $t('message.layout.fourIsInvert') }}</div>
 					<div class="layout-breadcrumb-seting-bar-flex-value">
 						<el-switch v-model="getThemeConfig.isInvert" @change="onAddFilterChange('invert')"></el-switch>
+					</div>
+				</div>
+
+				<!-- 其它设置 -->
+				<el-divider content-position="left">{{ $t('message.layout.fiveTitle') }}</el-divider>
+				<div class="layout-breadcrumb-seting-bar-flex mt15">
+					<div class="layout-breadcrumb-seting-bar-flex-label">{{ $t('message.layout.fiveTagsStyle') }}</div>
+					<div class="layout-breadcrumb-seting-bar-flex-value">
+						<el-select v-model="getThemeConfig.tagsStyle" placeholder="请选择" size="mini" style="width: 90px" @change="setLocalThemeConfig">
+							<el-option label="风格1" value="tags-style-one"></el-option>
+						</el-select>
+					</div>
+				</div>
+				<div class="layout-breadcrumb-seting-bar-flex mt15">
+					<div class="layout-breadcrumb-seting-bar-flex-label">{{ $t('message.layout.fiveAnimation') }}</div>
+					<div class="layout-breadcrumb-seting-bar-flex-value">
+						<el-select v-model="getThemeConfig.animation" placeholder="请选择" size="mini" style="width: 90px" @change="setLocalThemeConfig">
+							<el-option label="slide-right" value="slide-right"></el-option>
+							<el-option label="slide-left" value="slide-left"></el-option>
+							<el-option label="opacitys" value="opacitys"></el-option>
+						</el-select>
+					</div>
+				</div>
+				<div class="layout-breadcrumb-seting-bar-flex mt15">
+					<div class="layout-breadcrumb-seting-bar-flex-label">{{ $t('message.layout.fiveColumnsAsideStyle') }}</div>
+					<div class="layout-breadcrumb-seting-bar-flex-value">
+						<el-select v-model="getThemeConfig.columnsAsideStyle" placeholder="请选择" size="mini" style="width: 90px" @change="setLocalThemeConfig">
+							<el-option label="圆角" value="columns-round"></el-option>
+							<el-option label="卡片" value="columns-card"></el-option>
+						</el-select>
+					</div>
+				</div>
+				<div class="layout-breadcrumb-seting-bar-flex mt15 mb28">
+					<div class="layout-breadcrumb-seting-bar-flex-label">{{ $t('message.layout.fiveColumnsAsideLayout') }}</div>
+					<div class="layout-breadcrumb-seting-bar-flex-value">
+						<el-select v-model="getThemeConfig.columnsAsideLayout" placeholder="请选择" size="mini" style="width: 90px" @change="setLocalThemeConfig">
+							<el-option label="水平" value="columns-horizontal"></el-option>
+							<el-option label="垂直" value="columns-vertical"></el-option>
+						</el-select>
 					</div>
 				</div>
 
@@ -194,8 +236,12 @@ export default {
 		},
 	},
 	created() {
+		// 判断当前布局是否不相同，不相同则初始化当前布局的样式，防止监听窗口大小改变时，布局配置logo、菜单背景等部分布局失效问题
+		if (!getLocal('frequency')) this.initSetLayoutChange();
+		setLocal('frequency', 1);
 		// 监听窗口大小改变，非默认布局，设置成默认布局（适配移动端）
 		this.bus.$on('layoutMobileResize', (res) => {
+			if (this.$store.state.themeConfig.themeConfig.layout === res.layout) return false;
 			this.$store.state.themeConfig.themeConfig.layout = res.layout;
 			this.$store.state.themeConfig.themeConfig.isDrawer = false;
 			this.$store.state.themeConfig.themeConfig.isCollapse = false;
@@ -209,11 +255,10 @@ export default {
 		// 初始化：刷新页面时，设置了值，直接取缓存中的值进行初始化
 		initLayoutConfig() {
 			window.addEventListener('load', () => {
-				// 灰色模式/色弱模式
-				if (getLocal('appFilterStyle')) {
-					const appEl = document.body;
-					appEl.style.cssText = getLocal('appFilterStyle');
-				}
+				// 灰色模式
+				if (this.$store.state.themeConfig.themeConfig.isGrayscale) this.onAddFilterChange('grayscale');
+				// 色弱模式
+				if (this.$store.state.themeConfig.themeConfig.isInvert) this.onAddFilterChange('invert');
 				// 语言国际化
 				if (getLocal('themeConfigPrev')) this.$i18n.locale = getLocal('themeConfigPrev').globalI18n;
 			});
@@ -251,7 +296,6 @@ export default {
 			const appEle = document.body;
 			appEle.setAttribute('style', `filter: ${cssAttr};`);
 			this.setLocalThemeConfig();
-			setLocal('appFilterStyle', appEle.style.cssText);
 		},
 		// 布局切换
 		onSetLayout(layout) {
@@ -264,35 +308,20 @@ export default {
 		// 设置布局切换，重置主题样式
 		initSetLayoutChange() {
 			if (this.$store.state.themeConfig.themeConfig.layout === 'classic') {
-				this.$store.state.themeConfig.themeConfig.isShowLogo = true;
-				this.$store.state.themeConfig.themeConfig.isBreadcrumb = false;
-				this.$store.state.themeConfig.themeConfig.isCollapse = false;
 				this.onBgColorPickerChange('menuBar', '#ffffff');
 				this.onBgColorPickerChange('menuBarColor', '#606266');
 				this.onBgColorPickerChange('topBar', '#ffffff');
 				this.onBgColorPickerChange('topBarColor', '#606266');
 			} else if (this.$store.state.themeConfig.themeConfig.layout === 'transverse') {
-				this.$store.state.themeConfig.themeConfig.isShowLogo = true;
-				this.$store.state.themeConfig.themeConfig.isBreadcrumb = false;
-				this.$store.state.themeConfig.themeConfig.isCollapse = false;
-				this.$store.state.themeConfig.themeConfig.isTagsview = false;
 				this.onBgColorPickerChange('menuBarColor', '#ffffff');
 				this.onBgColorPickerChange('topBar', '#545c64');
 				this.onBgColorPickerChange('topBarColor', '#ffffff');
 			} else if (this.$store.state.themeConfig.themeConfig.layout === 'columns') {
-				this.$store.state.themeConfig.themeConfig.isShowLogo = true;
-				this.$store.state.themeConfig.themeConfig.isBreadcrumb = true;
-				this.$store.state.themeConfig.themeConfig.isCollapse = false;
-				this.$store.state.themeConfig.themeConfig.isTagsview = true;
 				this.onBgColorPickerChange('menuBar', '#ffffff');
 				this.onBgColorPickerChange('menuBarColor', '#606266');
 				this.onBgColorPickerChange('topBar', '#ffffff');
 				this.onBgColorPickerChange('topBarColor', '#606266');
 			} else {
-				this.$store.state.themeConfig.themeConfig.isShowLogo = false;
-				this.$store.state.themeConfig.themeConfig.isBreadcrumb = true;
-				this.$store.state.themeConfig.themeConfig.isCollapse = false;
-				this.$store.state.themeConfig.themeConfig.isTagsview = true;
 				this.onBgColorPickerChange('menuBar', '#545c64');
 				this.onBgColorPickerChange('menuBarColor', '#eaeaea');
 				this.onBgColorPickerChange('topBar', '#ffffff');
