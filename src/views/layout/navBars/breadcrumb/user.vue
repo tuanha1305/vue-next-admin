@@ -42,7 +42,7 @@
 		<div class="layout-navbars-breadcrumb-user-icon mr10" @click="onScreenfullClick">
 			<i
 				class="iconfont"
-				:title="isScreenfull ? $t('message.user.title5') : $t('message.user.title6')"
+				:title="isScreenfull ? $t('message.user.title6') : $t('message.user.title5')"
 				:class="!isScreenfull ? 'icon-fullscreen' : 'icon-tuichuquanping'"
 			></i>
 		</div>
@@ -54,6 +54,7 @@
 			</span>
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item command="/home">{{ $t('message.user.dropdown1') }}</el-dropdown-item>
+				<el-dropdown-item command="wareHouse">{{ $t('message.user.dropdown6') }}</el-dropdown-item>
 				<el-dropdown-item command="/personal">{{ $t('message.user.dropdown2') }}</el-dropdown-item>
 				<el-dropdown-item command="/404">{{ $t('message.user.dropdown3') }}</el-dropdown-item>
 				<el-dropdown-item command="/401">{{ $t('message.user.dropdown4') }}</el-dropdown-item>
@@ -67,7 +68,7 @@
 <script>
 import screenfull from 'screenfull';
 import { resetRouter } from '@/router/index.js';
-import { clearSession, removeLocal, getLocal, setLocal } from '@/utils/storage.js';
+import { Session, Local } from '@/utils/storage.js';
 import UserNews from '@/views/layout/navBars/breadcrumb/userNews.vue';
 import Search from '@/views/layout/navBars/breadcrumb/search.vue';
 export default {
@@ -96,7 +97,7 @@ export default {
 		},
 	},
 	mounted() {
-		if (getLocal('themeConfigPrev')) {
+		if (Local.get('themeConfigPrev')) {
 			this.initI18n();
 			this.initComponentSize();
 		}
@@ -121,24 +122,24 @@ export default {
 		},
 		// 组件大小改变
 		onComponentSizeChange(size) {
-			removeLocal('themeConfigPrev');
+			Local.remove('themeConfigPrev');
 			this.$store.state.themeConfig.themeConfig.globalComponentSize = size;
-			setLocal('themeConfigPrev', this.$store.state.themeConfig.themeConfig);
+			Local.set('themeConfigPrev', this.$store.state.themeConfig.themeConfig);
 			this.$ELEMENT.size = size;
 			this.initComponentSize();
 			window.location.reload();
 		},
 		// 语言切换
 		onLanguageChange(lang) {
-			removeLocal('themeConfigPrev');
+			Local.remove('themeConfigPrev');
 			this.$store.state.themeConfig.themeConfig.globalI18n = lang;
-			setLocal('themeConfigPrev', this.$store.state.themeConfig.themeConfig);
+			Local.set('themeConfigPrev', this.$store.state.themeConfig.themeConfig);
 			this.$i18n.locale = lang;
 			this.initI18n();
 		},
 		// 初始化言语国际化
 		initI18n() {
-			switch (getLocal('themeConfigPrev').globalI18n) {
+			switch (Local.get('themeConfigPrev').globalI18n) {
 				case 'zh-cn':
 					this.disabledI18n = 'zh-cn';
 					break;
@@ -152,7 +153,7 @@ export default {
 		},
 		// 初始化全局组件大小
 		initComponentSize() {
-			switch (getLocal('themeConfigPrev').globalComponentSize) {
+			switch (Local.get('themeConfigPrev').globalComponentSize) {
 				case '':
 					this.disabledSize = '';
 					break;
@@ -195,7 +196,7 @@ export default {
 						},
 					})
 						.then(() => {
-							clearSession(); // 清除缓存/token等
+							Session.clear(); // 清除缓存/token等
 							this.$store.dispatch('routesList/setRoutesList', []); // 清空 vuex 路由列表缓存
 							resetRouter(); // 删除/重置路由
 							this.$router.push('/login');
@@ -205,6 +206,8 @@ export default {
 						})
 						.catch(() => {});
 				}, 150);
+			} else if (path === 'wareHouse') {
+				window.open('https://gitee.com/lyt-top/vue-next-admin');
 			} else {
 				this.$router.push(path);
 			}
