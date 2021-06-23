@@ -1,6 +1,6 @@
 {
 	"name": "vue-next-admin",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
@@ -35,8 +35,8 @@
 		"@types/node": "^15.12.4",
 		"@types/nprogress": "^0.2.0",
 		"@types/sortablejs": "^1.10.6",
-		"@typescript-eslint/eslint-plugin": "^4.27.0",
-		"@typescript-eslint/parser": "^4.27.0",
+		"@typescript-eslint/eslint-plugin": "^4.28.0",
+		"@typescript-eslint/parser": "^4.28.0",
 		"@vitejs/plugin-vue": "^1.2.3",
 		"@vue/compiler-sfc": "^3.1.1",
 		"dotenv": "^10.0.0",
